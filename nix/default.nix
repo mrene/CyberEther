@@ -7,13 +7,24 @@
 , cmake
 , fmt_9
 , soapysdr
-
-# macOS deps
+, gst_all_1
 , spirv-cross
 , glslang
 , glfw
-, darwin
 
+# Linux deps
+, vulkan-validation-layers
+, vulkan-headers
+
+# macOS deps
+, Foundation
+, AVFoundation
+, CoreAudio
+, AppKit
+, Metal
+, MetalKit
+, AudioToolbox
+, Cocoa
 }:
 
 stdenv.mkDerivation rec {
@@ -37,16 +48,27 @@ stdenv.mkDerivation rec {
   buildInputs = [
     soapysdr
     fmt_9
-
     glfw
     spirv-cross
     glslang
-  ] ++  lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ Foundation AVFoundation CoreFoundation CoreAudio AppKit Metal MetalKit AudioToolbox Cocoa ]);
 
-
-  #mesonFlags = [
-    #"-Dcpp_std=c++2a"
-  #];
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-libav
+  ] ++ lib.optionals stdenv.isLinux [
+    vulkan-validation-layers
+    vulkan-headers
+  ] ++ lib.optionals stdenv.isDarwin [ 
+    Foundation 
+    AVFoundation
+    CoreAudio
+    AppKit
+    Metal
+    MetalKit 
+    AudioToolbox
+    Cocoa
+  ];
 
   meta = with lib; {
     description = "Radio: the final frontier";
